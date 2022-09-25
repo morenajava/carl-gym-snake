@@ -120,8 +120,8 @@ class BaseGrid:
         self.snakes = []
 
         for i in range(num_snakes):
-            x = self.np_random.randint(0, self.width)
-            y = self.np_random.randint(0, self.height)
+            x = np.random.randint(0, self.width)
+            y = np.random.randint(0, self.height)
             direction = self.get_random_direction()
 
             rotated_green = rotate_color(0, 255, 0, i / num_snakes)
