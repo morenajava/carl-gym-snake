@@ -156,6 +156,7 @@ class SnakeEnv(gym.Env):
 
         return obs
 
+
     def get_obs(self):
         return self.grid.encode()
 

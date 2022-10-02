@@ -11,6 +11,7 @@ class ObjectColor:
     other_body = 128, 255, 128
     dead_head = 128, 128, 128
     dead_body = 64, 64, 64
+    wall = 255, 255, 1
 
 
 class GridType(IntEnum):

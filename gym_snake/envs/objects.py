@@ -63,6 +63,13 @@ class Snake:
         for i, p in enumerate(self._deque):
             color = self._color_head if (i == head_id) else self._color_body
             cell_renderer(p, color)
+    def snake_head(self):
+        head_id = len(self._deque) - 1
+        for i, p in enumerate(self._deque):
+            if i == head_id:
+                head = p
+        return head
+
 
 
 class Apples:

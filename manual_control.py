@@ -21,7 +21,7 @@ def main():
         "--env-name",
         dest="env_name",
         help="gym-snake environment to load",
-        default='Snake-8x8-v0'
+        default='Snake-16x16-v0'
     )
     (options, args) = parser.parse_args()
 
