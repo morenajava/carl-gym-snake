@@ -248,7 +248,7 @@ class BaseGrid:
         for i in range(4 - snake._direction):
             grid = grid.rotate_left()
 
-        vis_mask = np.ones(shape=(grid.width, grid.height), dtype=bool)
+        vis_mask = grid.process_vis(agent_pos=(self.agent_view_size // 2 , self.agent_view_size - 1))
 
         # Make it so the agent sees what it's carrying
         # We do this by placing the carried object at the agent's position
@@ -508,13 +508,17 @@ class Grid:
 
             array = np.zeros((self.width, self.height, 3), dtype='uint8')
 
+            for col in range(self.width):
+                for row in range(self.height):
+                    array[col][row] = ObjectColor.wall
+
             for i in range(self.width):
                 for j in range(self.height):
                     if vis_mask[i, j]:
                         v = self.get(i, j)
 
                         if v is None:
-                            array[i, j] = ObjectColor.empty  # modified morena
+                            array[i, j] = ObjectColor.wall  # modified morena
 
                         else:
                             array[i, j, :] = v
@@ -559,7 +563,7 @@ class Grid:
                         continue
 
                     cell = grid.get(i, j)
-                    if cell and not cell.see_behind():
+                    if np.array_equal(cell,ObjectColor.wall):
                         continue
 
                     mask[i + 1, j] = True
@@ -572,7 +576,7 @@ class Grid:
                         continue
 
                     cell = grid.get(i, j)
-                    if cell and not cell.see_behind():
+                    if np.array_equal(cell,ObjectColor.wall):
                         continue
 
                     mask[i - 1, j] = True
