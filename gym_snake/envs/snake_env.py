@@ -10,7 +10,7 @@ CELL_PIXELS = 32
 
 class SnakeEnv(gym.Env):
     metadata = {
-        'render.modes': ['human', 'rgb_array', 'pixmap'],
+        'render.modes': ['human', 'rgb_array', 'pixmap','agent'],
         'video.frames_per_second': 10
     }
 
@@ -170,19 +170,24 @@ class SnakeEnv(gym.Env):
 
             r_width, r_height = self.grid.get_renderer_dimensions(CELL_PIXELS)
             self.grid_render = Renderer(
-                r_width,
-                r_height,
+                 7 if mode == 'agent' else r_width,
+                7 if mode == 'agent' else r_height,
                 True if mode == 'human' else False
             )
 
         r = self.grid_render
 
         r.beginFrame()
-        self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
+        if mode!='agent':
+            r.height = 7
+            r.width = 7
+            self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
+        else:
+            self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
         r.endFrame()
 
         if mode == 'rgb_array':
-            return r.getArray()
+                return r.getArray()
         elif mode == 'pixmap':
             return r.getPixmap()
 

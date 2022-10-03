@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 from __future__ import division, print_function
 
 import sys
@@ -7,9 +8,10 @@ import gym
 import time
 from optparse import OptionParser
 
-import gym_snake
+# import gym_snake
 from gym_snake.envs.constants import GridType, Action4, Action6
 from PyQt5.QtCore import Qt
+
 
 is_done = False
 
@@ -37,7 +39,7 @@ def main():
     resetEnv()
 
     # Create a window to render into
-    renderer = env.render('human')
+    renderer = env.render('agent')
 
     def keyDownCb(keyName):
         global is_done
@@ -81,6 +83,7 @@ def main():
             print('Unknown grid type: ', env.grid_type)
 
         if action is None:
+
             return
 
         obs, reward, done, info = env.step(action)
@@ -94,7 +97,7 @@ def main():
     renderer.window.setKeyDownCb(keyDownCb)
 
     while True:
-        env.render('human')
+        env.render('agent')
         time.sleep(0.01)
 
         # If the window was closed
