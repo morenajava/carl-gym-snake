@@ -26,5 +26,5 @@ GYM_ENVIRONMENT = "Snake-16x16-v0"
 # GYM_ENVIRONMENT = "MiniGrid-LavaGapS5-v0"
 STEPS = 50000
 SEED = 20
-CARL = "mask"  # none/mask/replace
+CARL = "none"  # none/mask/replace
 CA_SERVER_CACHE = 0.01

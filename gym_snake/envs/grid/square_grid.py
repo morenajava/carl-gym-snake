@@ -3,9 +3,12 @@ from gym_snake.envs.grid.base_grid import BaseGrid
 import numpy as np
 
 class SquareGrid(BaseGrid):
-
+    mode = ''
     def __init__(self, *args, **kwargs):
         super(SquareGrid, self).__init__(*args, **kwargs)
+
+    def mode(self, agentmode):
+        self.mode = agentmode
 
     def get_forward_action(self):
         return Action4.forward
@@ -14,7 +17,10 @@ class SquareGrid(BaseGrid):
         return Direction4(self.np_random.randint(0, len(Direction4)))
 
     def get_renderer_dimensions(self, tile_size):
-        return self.width * tile_size, self.height * tile_size
+        if self.mode == 'agent':
+          return 7 * tile_size, 7 * tile_size
+        else:
+          return self.width * tile_size, self.height * tile_size
         # return 7 * tile_size, 7 * tile_size
 
     def render(self, r, tile_size, cell_pixels):

@@ -6,11 +6,11 @@ from gym_snake.envs.constants import Action4, Action6, GridType
 from gym_snake.envs.grid import SquareGrid, HexGrid
 
 CELL_PIXELS = 32
-
+mode = 'agent'
 
 class SnakeEnv(gym.Env):
     metadata = {
-        'render.modes': ['human', 'rgb_array', 'pixmap','agent'],
+        'render.modes': ['human', 'rgb_array', 'pixmap'],
         'video.frames_per_second': 10
     }
 
@@ -81,7 +81,7 @@ class SnakeEnv(gym.Env):
         self.grid = None
         self.grid_render = None
 
-        self.reset()
+        # self.reset()
 
     def seed(self, seed=0):
         self.np_random, seed = seeding.np_random(seed)
@@ -168,22 +168,25 @@ class SnakeEnv(gym.Env):
         if self.grid_render is None or self.grid_render.window is None:
             from gym_snake.rendering import Renderer
 
-            r_width, r_height = self.grid.get_renderer_dimensions(CELL_PIXELS)
+            if mode == 'agent':
+                r_width, r_height = 7 * CELL_PIXELS, 7 * CELL_PIXELS
+                self.width = 7
+                self.height = 7
+                self.grid.mode(mode)
+                # self.grid.set_mode(mode)
+            else:
+                r_width, r_height = self.grid.get_renderer_dimensions(CELL_PIXELS)
+
             self.grid_render = Renderer(
-                 7 if mode == 'agent' else r_width,
-                7 if mode == 'agent' else r_height,
-                True if mode == 'human' else False
+                    r_width,
+                    r_height,
+                    True if (mode == 'human' or mode == 'agent') else False
             )
 
         r = self.grid_render
 
         r.beginFrame()
-        if mode!='agent':
-            r.height = 7
-            r.width = 7
-            self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
-        else:
-            self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
+        self.grid.render(r, CELL_PIXELS, 4 * CELL_PIXELS)
         r.endFrame()
 
         if mode == 'rgb_array':

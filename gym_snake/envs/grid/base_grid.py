@@ -177,7 +177,7 @@ class BaseGrid:
 
         for p in self.apples:
             result[p] = ObjectColor.apple
-
+            print("apple is:",p)
         for i, snake in enumerate(self.snakes):
             if not snake.alive:
                 body_color = ObjectColor.dead_body
@@ -197,6 +197,8 @@ class BaseGrid:
                 last_p = p
 
             result[last_p] = head_color
+            print("snake head is",last_p)
+
         self.init_view = result
         self.grid, vis_mask = self.gen_obs_grid(snake_v)
         return self.grid.encode(vis_mask)
@@ -209,27 +211,27 @@ class BaseGrid:
         Note: the bottom extent indices are not included in the set
         """
 
-        # Facing right
+        # Facing east
         if snake._direction == 1:
             topX = snake.snake_head()[0]
-            topY = snake.snake_head()[1] - self.height // 2
-        # Facing down
+            topY = snake.snake_head()[1] - self.agent_view_size // 2
+        # Facing south
         elif snake._direction == 2:
             topX = snake.snake_head()[0] - self.agent_view_size // 2
             topY = snake.snake_head()[1]
-        # Facing left
+        # Facing west
         elif snake._direction == 3:
             topX = snake.snake_head()[0] - self.agent_view_size + 1
             topY = snake.snake_head()[1] - self.agent_view_size // 2
-        # Facing up
+        # Facing north
         elif snake._direction == 0:
             topX = snake.snake_head()[0] - self.agent_view_size // 2
             topY = snake.snake_head()[1] - self.agent_view_size + 1
         else:
             assert False, "invalid agent direction"
 
-        botX = topX + self.agent_view_size
-        botY = topY + self.agent_view_size
+        botX = topX + self.agent_view_size - 1
+        botY = topY + self.agent_view_size - 1
 
         return (topX, topY, botX, botY)
 
@@ -243,17 +245,24 @@ class BaseGrid:
 
         topX, topY, botX, botY = self.get_view_exts(snake)
 
+        print("view box is topx,topy,btnx,btny",topX, topY, botX, botY )
+
         grid = self.slice(topX, topY, self.agent_view_size, self.agent_view_size)
 
-        for i in range(4 - snake._direction):
+        print("grid BEFORE rotate is : ", grid.encode())
+
+        for i in range(snake._direction):
             grid = grid.rotate_left()
 
-        vis_mask = grid.process_vis(agent_pos=(self.agent_view_size // 2 , self.agent_view_size - 1))
+        print("grid after rotate is : ",grid.encode())
+
+        # vis_mask = grid.process_vis(agent_pos=(self.agent_view_size // 2 , self.agent_view_size - 1))
+        vis_mask = np.ones(shape=(grid.width,grid.height),dtype=bool)
 
         # Make it so the agent sees what it's carrying
         # We do this by placing the carried object at the agent's position
         # in the agent's partially observable view
-        agent_pos = grid.width // 2, grid.height - 1
+        # agent_pos = grid.width // 2, grid.height - 1
 
         # grid.set(*agent_pos, None)
 
@@ -288,7 +297,7 @@ class BaseGrid:
                             y >= 0 and y < self.height:
                         v = self.init_view[x][y]
                     else:
-                        v = ObjectColor.wall
+                        v = np.asarray(ObjectColor.wall)
 
                     grid.set(i, j, v)
 
@@ -508,9 +517,9 @@ class Grid:
 
             array = np.zeros((self.width, self.height, 3), dtype='uint8')
 
-            for col in range(self.width):
-                for row in range(self.height):
-                    array[col][row] = ObjectColor.wall
+            # for col in range(self.width):
+            #     for row in range(self.height):
+            #         array[col][row] = ObjectColor.wall
 
             for i in range(self.width):
                 for j in range(self.height):
@@ -518,12 +527,13 @@ class Grid:
                         v = self.get(i, j)
 
                         if v is None:
-                            array[i, j] = ObjectColor.wall  # modified morena
+                            array[i, j] = ObjectColor.empty  # modified morena
 
                         else:
                             array[i, j, :] = v
-
-            return array
+            arr7 = array;
+            arr16 = arr7.resize(0,(16,16,3))
+            return arr16
 
         @staticmethod
         def decode(array):

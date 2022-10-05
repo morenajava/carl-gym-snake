@@ -78,6 +78,7 @@ is_minigrid_env = True
 
 env = gym.make(args.env)
 env.seed(args.seed)
+# env.render('agent')
 env = Monitor(env, filename=bios.GYM_MONITOR_PATH)  # from sb3 for logging
 env = ca.FlatObsImageOnlyWrapper(env)
 
