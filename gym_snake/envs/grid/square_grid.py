@@ -18,7 +18,7 @@ class SquareGrid(BaseGrid):
 
     def get_renderer_dimensions(self, tile_size):
         if self.mode == 'agent':
-          return 7 * tile_size, 7 * tile_size
+          return self.agent_view_size * tile_size, self.agent_view_size * tile_size
         else:
           return self.width * tile_size, self.height * tile_size
         # return 7 * tile_size, 7 * tile_size

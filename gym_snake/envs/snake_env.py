@@ -30,6 +30,7 @@ class SnakeEnv(gym.Env):
         done_apple=False,
         always_expand=False,
         max_steps=1000,
+        agent_view_size = 7, #Morena
         seed=0
     ):
         assert num_snakes >= 1
@@ -53,7 +54,7 @@ class SnakeEnv(gym.Env):
 
         self.done_apple = done_apple
         self.always_expand = always_expand
-
+        self.agent_view_size = agent_view_size
         self.actions = []
         self.action_space = []
         self.observation_space = []
@@ -107,13 +108,14 @@ class SnakeEnv(gym.Env):
                     rewards[i] = self.reward_timeout
                     dones[i] = True
 
-        obs = self.get_obs()
+        obs = self.get_obs(int(self.observation_space.shape[0]))
 
         if self.num_snakes == 1:
             obs = obs[0]
             rewards = rewards[0]
             dones = dones[0]
-
+        if dones == True:
+            self.reset()
         return obs, rewards, dones, {}
 
     def reset(self):
@@ -149,7 +151,7 @@ class SnakeEnv(gym.Env):
         else:
             raise ValueError("Unrecognized grid type: ", self.grid_type)
 
-        obs = self.get_obs()
+        obs = self.get_obs(int(self.observation_space.shape[0]))
 
         if self.num_snakes == 1:
             obs = obs[0]
@@ -157,8 +159,8 @@ class SnakeEnv(gym.Env):
         return obs
 
 
-    def get_obs(self):
-        return self.grid.encode()
+    def get_obs(self,grid_size):
+        return self.grid.encode(grid_size)
 
     def render(self, mode='human', close=False):
         if close:
@@ -169,9 +171,9 @@ class SnakeEnv(gym.Env):
             from gym_snake.rendering import Renderer
 
             if mode == 'agent':
-                r_width, r_height = 7 * CELL_PIXELS, 7 * CELL_PIXELS
-                self.width = 7
-                self.height = 7
+                r_width, r_height = self.agent_view_size * CELL_PIXELS, self.agent_view_size * CELL_PIXELS
+                # self.width = 7
+                # self.height = 7
                 self.grid.mode(mode)
                 # self.grid.set_mode(mode)
             else:

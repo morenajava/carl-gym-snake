@@ -3,15 +3,15 @@ from enum import IntEnum
 
 class ObjectColor:
     """ Object color used on observation encoding """
-    empty = 0, 128, 128
-    apple = 255, 0, 0
-    own_head = 0, 0, 255
-    own_body = 0, 255, 0
+    empty = 0, 0, 0
+    apple = 200, 200, 200
+    own_head = 100, 100, 100
+    own_body = 55, 55, 55
     other_head = 128, 128, 255
     other_body = 128, 255, 128
     dead_head = 128, 128, 128
     dead_body = 64, 64, 64
-    wall = 255, 255, 0
+    wall = 10, 10, 10
 
 
 class GridType(IntEnum):

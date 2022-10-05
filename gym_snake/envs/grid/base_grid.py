@@ -30,7 +30,8 @@ class BaseGrid:
         reward_none=0,
         reward_collision=-1,
         done_apple=False,
-        always_expand=False
+        always_expand=False,
+        agent_view_size= 7
     ):
         assert width >= initial_snake_size
         assert height >= initial_snake_size
@@ -55,7 +56,7 @@ class BaseGrid:
 
         self.add_snakes(num_snakes, initial_snake_size)
         self.add_apples(num_apples)
-        self.agent_view_size = 7
+        self.agent_view_size = agent_view_size
         self.grid = None
         self.init_view = None
     def move(self, actions):
@@ -99,8 +100,8 @@ class BaseGrid:
 
         return rewards, dones
 
-    def encode(self):
-        return [self.encode_agent(i) for i in range(self.num_snakes)]
+    def encode(self,grid_size):
+        return [self.encode_agent(i,grid_size) for i in range(self.num_snakes)]
 
     def __eq__(self, other):
         self_encode = self.encode()
@@ -167,7 +168,7 @@ class BaseGrid:
 
         return False
 
-    def encode_agent(self, agent_number):
+    def encode_agent(self, agent_number,grid_size):
         result = np.zeros((self.width, self.height, 3), dtype='uint8')
         snake_v = None
 
@@ -200,8 +201,10 @@ class BaseGrid:
             print("snake head is",last_p)
 
         self.init_view = result
-        self.grid, vis_mask = self.gen_obs_grid(snake_v)
-        return self.grid.encode(vis_mask)
+        if snake.alive:
+            self.grid, vis_mask = self.gen_obs_grid(snake_v,grid_size)
+
+        return self.grid.encode(grid_size)
         # return result
 
     # Morena
@@ -236,7 +239,7 @@ class BaseGrid:
         return (topX, topY, botX, botY)
 
     # Morena
-    def gen_obs_grid(self,snake):
+    def gen_obs_grid(self,snake,grid_size):
         """
         Generate the sub-grid observed by the agent.
         This method also outputs a visibility mask telling us which grid
@@ -249,12 +252,12 @@ class BaseGrid:
 
         grid = self.slice(topX, topY, self.agent_view_size, self.agent_view_size)
 
-        print("grid BEFORE rotate is : ", grid.encode())
+        # print("grid BEFORE rotate is : ", grid.encode(grid_size))
 
         for i in range(snake._direction):
             grid = grid.rotate_left()
 
-        print("grid after rotate is : ",grid.encode())
+        # print("grid after rotate is : ",grid.encode(grid_size))
 
         # vis_mask = grid.process_vis(agent_pos=(self.agent_view_size // 2 , self.agent_view_size - 1))
         vis_mask = np.ones(shape=(grid.width,grid.height),dtype=bool)
@@ -507,7 +510,7 @@ class Grid:
         #
         #     return img
 
-        def encode(self, vis_mask=None):
+        def encode(self, grid_size,vis_mask=None):
             """
             Produce a compact numpy encoding of the grid
             """
@@ -516,6 +519,7 @@ class Grid:
                 vis_mask = np.ones((self.width, self.height), dtype=bool)
 
             array = np.zeros((self.width, self.height, 3), dtype='uint8')
+            array_16 = np.zeros((grid_size, grid_size, 3), dtype='uint8')
 
             # for col in range(self.width):
             #     for row in range(self.height):
@@ -527,13 +531,13 @@ class Grid:
                         v = self.get(i, j)
 
                         if v is None:
-                            array[i, j] = ObjectColor.empty  # modified morena
+                            array_16[i, j] = ObjectColor.empty  # modified morena
 
                         else:
-                            array[i, j, :] = v
-            arr7 = array;
-            arr16 = arr7.resize(0,(16,16,3))
-            return arr16
+                            array_16[i, j, :] = v
+            # arr7 = array;
+            # arr16 = arr7.resize(0,(16,16,3))
+            return array_16
 
         @staticmethod
         def decode(array):
